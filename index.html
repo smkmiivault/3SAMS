@@ -334,6 +334,24 @@
             }
         }
 
+        @media (max-width: 640px) {
+            @keyframes revealText {
+                from {
+                    opacity: 0;
+                    letter-spacing: 0.8em;
+                    filter: blur(10px);
+                    transform: scale(0.95);
+                }
+
+                to {
+                    opacity: 1;
+                    letter-spacing: 0.4em;
+                    filter: blur(0);
+                    transform: scale(1);
+                }
+            }
+        }
+
         @keyframes fadeIn {
             from {
                 opacity: 0;
@@ -383,7 +401,7 @@
                 <div class="loader-bar"></div>
             </div>
 
-            <div id="counter" class="percentage">INITIALIZING INTERFACE 0%</div>
+            <div id="counter" class="percentage">MEMUAT SISTEM 0%</div>
         </div>
 
         <div class="animated-bg">
@@ -438,10 +456,7 @@
     <script>
         let count = 0;
         const phrases = [
-            "INITIALIZING INTERFACE",
-            "SECURE TUNNELING",
-            "ESTABLISHING PROTOCOLS",
-            "ACCESS GRANTED"
+            "MEMULAKAN ANTARA MUKA", "MEWUJUDKAN PROTOKOL", "MENGUNCI KESELAMATAN", "AKSES DIBERIKAN"
         ];
 
         function startCounter() {
