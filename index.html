@@ -2,6 +2,11 @@
 <html lang="ms">
 
 <head>
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="manifest" href="site.webmanifest">
+
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>3 SIDDIQ ELITE | AMS</title>
@@ -49,7 +54,7 @@
             try {
                 redirecting = true;
                 await signInWithEmailAndPassword(auth, email, password);
-                //window.location.replace("https://smkmiivault.github.io/3SAMS-PanelUtama/");
+                window.location.replace("https://smkmiivault.github.io/3SAMS-PanelUtama/");
             } catch (err) {
                 redirecting = false;
                 alert("RALAT: Kredensial tidak sah.");
@@ -96,7 +101,7 @@
 
         onAuthStateChanged(auth, (user) => {
             if (user && !redirecting) {
-                //window.location.replace("https://smkmiivault.github.io/3SAMS-PanelUtama/");
+                window.location.replace("https://smkmiivault.github.io/3SAMS-PanelUtama/");
             }
         });
     </script>
@@ -121,23 +126,24 @@
         }
 
         .hero {
-            position: relative;
-            height: 100vh;
-            overflow: hidden;
-            background: black;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
         }
 
-        .hero-video {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            min-width: 100%;
-            min-height: 100%;
+        .hero-media video {
+            max-width: 90vw;
+            max-height: 70vh;
             width: auto;
             height: auto;
-            transform: translate(-50%, -50%);
-            object-fit: cover;
-            filter: brightness(0.7);
+            border-radius: 18px;
+            box-shadow: 0 40px 120px rgba(0, 0, 0, 0.6);
         }
 
         .hero-content {
@@ -247,8 +253,10 @@
     <!-- HERO SECTION -->
     <main>
         <section class="hero-video-container">
-            <video autoplay muted loop playsinline class="hero-video">
-                <source src="3samsvidassets.mp4" type="video/mp4">
+            <div class="hero-media">
+                <video autoplay muted loop playsinline>
+                    <source src="3samsvidassets.mp4" type="video/mp4">
+            </div>
             </video>
 
             <div class="hero-content">
