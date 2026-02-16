@@ -7,7 +7,7 @@
     <title>3 SIDDIQ ELITE | AMS</title>
 
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;400;600;800&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Orbitron:wght@700&display=swap" rel="stylesheet">
 
     <script type="module">
         import {
@@ -19,6 +19,7 @@
             onAuthStateChanged
         } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
+        // Konfigurasi asal anda dikekalkan
         const firebaseConfig = {
             apiKey: "AIzaSyBV5pPnUoZ5__ZDnpqutonr0xD8gI1Za7o",
             authDomain: "semii2go.firebaseapp.com",
@@ -31,10 +32,9 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        const loaderStartTime = Date.now();
-        const MIN_LOADER_TIME = 4500;
         let redirecting = false;
 
+        // Fungsi Login
         window.handleLogin = async (e) => {
             e.preventDefault();
             if (redirecting) return;
@@ -43,390 +43,277 @@
             const email = e.target.querySelector("input[type=email]").value;
             const password = e.target.querySelector("input[type=password]").value;
 
-            btn.innerHTML = `<span class="flex items-center justify-center gap-3 animate-pulse">
-                <div class="terminal-loader"></div> MENGAKSES SISTEM...
-            </span>`;
-            btn.classList.add('btn-processing');
             btn.disabled = true;
+            btn.innerHTML = `<span class="flex items-center justify-center gap-2"><div class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div> MENGESAHKAN...</span>`;
 
             try {
                 redirecting = true;
                 await signInWithEmailAndPassword(auth, email, password);
-                window.location.replace("https://smkmiivault.github.io/3SAMS-PanelUtama/");
+                //window.location.replace("https://smkmiivault.github.io/3SAMS-PanelUtama/");
             } catch (err) {
                 redirecting = false;
-                showNotification("RALAT SISTEM: Identiti Gagal Disahkan.");
-                btn.innerHTML = "MULAKAN AKSES";
-                btn.classList.remove('btn-processing');
+                alert("RALAT: Kredensial tidak sah.");
+                btn.innerHTML = "LOG MASUK";
                 btn.disabled = false;
             }
         };
 
-        function showNotification(msg) {
-            const toast = document.getElementById('toast');
-            toast.innerText = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 4000);
-        }
+        // Modal Logic
+        window.toggleLoginModal = (show) => {
+            const modal = document.getElementById('loginModal');
+            if (show) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                setTimeout(() => modal.style.opacity = "1", 10);
+            } else {
+                modal.style.opacity = "0";
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                }, 300);
+            }
+        };
+
+        // Loading Screen Logic
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('master-loader');
+            let progress = 0;
+            const progressText = document.getElementById('progress-text');
+
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        loader.style.opacity = '0';
+                        setTimeout(() => loader.remove(), 500);
+                    }, 500);
+                }
+                progressText.innerText = Math.floor(progress) + "%";
+            }, 150);
+        });
 
         onAuthStateChanged(auth, (user) => {
-            const loader = document.getElementById("master-loader");
-            const elapsed = Date.now() - loaderStartTime;
-            const remaining = Math.max(0, MIN_LOADER_TIME - elapsed);
-
-            setTimeout(() => {
-                if (loader) {
-                    loader.style.opacity = '0';
-                    loader.style.filter = 'blur(20px)';
-                    setTimeout(() => loader.remove(), 1000);
-                }
-
-                if (user && !redirecting) {
-                    redirecting = true;
-                    window.location.replace("https://smkmiivault.github.io/3SAMS-PanelUtama/");
-                }
-            }, remaining);
+            if (user && !redirecting) {
+                //window.location.replace("https://smkmiivault.github.io/3SAMS-PanelUtama/");
+            }
         });
     </script>
 
     <style>
-        :root {
-            --neon-blue: #00d2ff;
-            --gold-elite: #d4af37;
-            --purple-taro: #8e44ad;
-            --deep-void: #020205;
-            --glass-white: rgba(255, 255, 255, 0.03);
-        }
-
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background: var(--deep-void);
-            color: #f8fafc;
-            margin: 0;
+            background-color: #ffffff;
+            color: #1a1a1a;
+        }
+
+        .hero-video-container {
+            position: relative;
+            width: 100%;
+            height: 70vh;
+            background: #f8f9fa;
+            border-radius: 0 0 60px 60px;
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 100vh;
         }
 
-        /* Balanced Liquid Background */
-        #bg-canvas {
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-            background: radial-gradient(circle at 50% 50%, #0a0e17 0%, #020205 100%);
-        }
-
-        .liquid-blob {
-            position: absolute;
-            width: 800px;
-            height: 800px;
-            filter: blur(140px);
-            border-radius: 50%;
-            z-index: -1;
-            animation: drift 30s infinite alternate ease-in-out;
-            opacity: 0.15;
-        }
-
-        @keyframes drift {
-            from {
-                transform: translate(-30%, -30%) scale(1);
-            }
-
-            to {
-                transform: translate(40%, 40%) scale(1.3) rotate(45deg);
-            }
-        }
-
-        .star {
-            position: absolute;
-            background: white;
-            border-radius: 50%;
-            opacity: 0.3;
-        }
-
-        /* Mono-Gold-Blue Glass Interface */
-        .hud-interface {
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(45px) saturate(160%);
-            -webkit-backdrop-filter: blur(45px) saturate(160%);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-top: 1px solid rgba(255, 255, 255, 0.25);
-            border-right: 1px solid rgba(212, 175, 55, 0.2);
-            box-shadow:
-                0 50px 100px -30px rgba(0, 0, 0, 0.9),
-                inset 0 0 30px rgba(0, 210, 255, 0.02);
+        .hero {
             position: relative;
-            padding: 4rem;
-            width: 100%;
-            max-width: 520px;
-            border-radius: 40px;
-            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            height: 100vh;
+            overflow: hidden;
+            background: black;
         }
 
-        .hud-interface:hover {
-            transform: translateY(-10px);
-            border-color: rgba(212, 175, 55, 0.4);
-            box-shadow: 0 60px 130px -30px rgba(212, 175, 55, 0.1);
+        .hero-video {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+            filter: brightness(0.7);
         }
 
-        /* Logo Glow - White/Gold Base */
-        .logo-glow {
-            filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.8)) drop-shadow(0 0 40px rgba(212, 175, 55, 0.3));
-            transition: all 0.5s ease;
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            color: white;
+            text-align: center;
+            top: 40%;
+            transform: translateY(-40%);
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
-        .logo-glow:hover {
-            filter: drop-shadow(0 0 30px rgba(255, 255, 255, 1)) drop-shadow(0 0 50px var(--gold-elite));
-            transform: translateY(-5px);
-        }
-
-        /* Balanced Gradient Text */
-        .title-elite {
+        .title-orbitron {
             font-family: 'Orbitron', sans-serif;
-            background: linear-gradient(to right, #ffffff, #d4af37, #00d2ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-transform: uppercase;
-            letter-spacing: 0.4em;
-            font-weight: 900;
+            letter-spacing: 0.15em;
         }
 
-        /* Input Design */
-        .input-group input {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
-            transition: all 0.4s ease;
+        .glass-modal {
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
 
-        .input-group input:focus {
-            border-color: var(--gold-elite);
-            background: rgba(255, 255, 255, 0.06);
-            box-shadow: 0 0 25px rgba(212, 175, 55, 0.2);
-            padding-left: 2rem;
+        .btn-premium {
+            background: #1a1a1a;
+            color: white;
+            transition: all 0.3s ease;
         }
 
-        /* Elegant Gradient Button */
-        .btn-access {
-            background: linear-gradient(135deg, #d4af37 0%, #a68a2d 50%, #00d2ff 100%);
-            background-size: 200% auto;
-            border: none;
-            color: #000;
-            font-weight: 900;
-            letter-spacing: 0.4em;
-            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 15px 35px -10px rgba(212, 175, 55, 0.5);
+        .btn-premium:hover {
+            background: #d4af37;
+            transform: translateY(-2px);
         }
 
-        .btn-access:hover {
-            background-position: right center;
-            color: #fff;
-            box-shadow: 0 25px 50px -10px rgba(0, 210, 255, 0.4);
-            transform: scale(1.02);
-        }
-
-        /* Premium Loader */
         #master-loader {
             position: fixed;
             inset: 0;
-            z-index: 10000;
-            background: #020205;
+            background: white;
+            z-index: 9999;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            transition: all 1.2s cubic-bezier(0.8, 0, 0.2, 1);
+            transition: opacity 0.5s ease;
         }
 
-        .loader-ring {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-top: 4px solid var(--gold-elite);
-            animation: spin 2s cubic-bezier(0.6, 0, 0.4, 1) infinite;
+        .loader-bar {
+            width: 200px;
+            height: 2px;
+            background: #eee;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
         }
 
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
+        .loader-bar-fill {
+            position: absolute;
+            height: 100%;
+            background: #d4af37;
+            width: 0%;
+            animation: loading 2s ease-in-out infinite;
+        }
+
+        @keyframes loading {
+            0% {
+                width: 0%;
+                left: 0;
             }
-        }
 
-        #toast {
-            position: fixed;
-            bottom: -100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            padding: 1.25rem 3rem;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 800;
-            letter-spacing: 0.2em;
-            color: #fff;
-            transition: all 0.6s cubic-bezier(0.2, 1, 0.3, 1.2);
-            z-index: 1000;
-            border: 1px solid var(--gold-elite);
-        }
+            50% {
+                width: 100%;
+                left: 0;
+            }
 
-        #toast.show {
-            bottom: 50px;
-        }
-
-        .terminal-loader {
-            width: 18px;
-            height: 18px;
-            border: 2px solid #000;
-            border-bottom-color: transparent;
-            border-radius: 50%;
-            animation: spin 0.6s linear infinite;
+            100% {
+                width: 0%;
+                left: 100%;
+            }
         }
     </style>
 </head>
 
-<body>
+<body class="antialiased">
 
-    <!-- LOADING SCREEN -->
+    <!-- LOADER -->
     <div id="master-loader">
-        <div class="relative">
-            <div class="loader-ring"></div>
-            <div class="loader-ring absolute inset-0" style="animation-duration: 3s; border-top-color: var(--neon-blue); transform: scale(0.8); border-width: 2px;"></div>
-            <div class="absolute inset-0 flex items-center justify-center">
-                <span class="text-[9px] font-black tracking-[0.5em] text-white/40 animate-pulse uppercase">SMKMII</span>
-            </div>
+        <img src="https://i.postimg.cc/FsL0XknW/SMKMII-LGO-removebg-preview.png" alt="Logo" class="h-12 mb-6 opacity-80">
+        <div class="text-[10px] font-bold tracking-[0.3em] uppercase text-gray-400">Memuatkan Sistem <span id="progress-text">0%</span></div>
+        <div class="loader-bar">
+            <div class="loader-bar-fill"></div>
         </div>
-        <h1 class="mt-16 text-xs font-bold tracking-[1.8em] text-white/80 uppercase ml-[1.8em]">Inisialisasi Sistem</h1>
-        <div id="loading-perc" class="mt-4 text-[10px] text-yellow-600 font-mono tracking-[0.8em]">PROTOKOL: 0%</div>
     </div>
 
-    <!-- BACKGROUND ELEMENTS -->
-    <div id="bg-canvas">
-        <!-- Biru Blob -->
-        <div class="liquid-blob" style="top: -10%; left: -10%; background: radial-gradient(circle, var(--neon-blue), transparent);"></div>
-        <!-- Gold Blob -->
-        <div class="liquid-blob" style="bottom: -10%; right: -5%; animation-delay: -10s; background: radial-gradient(circle, var(--gold-elite), transparent);"></div>
-        <!-- Purple Blob (Minor) -->
-        <div class="liquid-blob" style="top: 40%; left: 30%; width: 400px; height: 400px; opacity: 0.05; background: radial-gradient(circle, var(--purple-taro), transparent);"></div>
-    </div>
-    <div id="stars-container" class="fixed inset-0 z-[-1]"></div>
-
-    <!-- MAIN INTERFACE -->
-    <div class="px-6 w-full flex flex-col items-center py-12 overflow-y-auto max-h-screen">
-
-        <!-- Branding Header -->
-        <div class="mb-14 text-center">
-            <div class="flex items-center justify-center gap-10 mb-10">
-                <img src="https://i.postimg.cc/FsL0XknW/SMKMII-LGO-removebg-preview.png" alt="SMKMII" class="h-16 md:h-20 logo-glow">
-                <div class="h-16 w-[1px] bg-gradient-to-b from-transparent via-white/20 to-transparent"></div>
-                <img src="https://i.postimg.cc/xCcWgqmx/photo-6057413719148399989-y-removebg-preview.png" alt="3Siddiq" class="h-20 md:h-24 logo-glow">
-            </div>
-            <h2 class="text-white/20 text-[10px] font-black tracking-[1.2em] uppercase mb-4 ml-[1.2em]">Sistem Pengurusan Kehadiran</h2>
-            <h1 class="title-elite text-3xl md:text-5xl">3 SIDDIQ ELITE</h1>
+    <!-- NAVBAR -->
+    <nav class="fixed top-0 w-full z-40 px-8 py-6 flex justify-between items-center bg-white/80 backdrop-blur-md">
+        <div class="flex items-center gap-4">
+            <img src="https://i.postimg.cc/FsL0XknW/SMKMII-LGO-removebg-preview.png" alt="SMKMII" class="h-10">
+            <div class="w-[1px] h-6 bg-gray-200"></div>
+            <span class="text-xs font-black tracking-widest uppercase">3 Siddiq Elite</span>
         </div>
+        <button onclick="toggleLoginModal(true)" class="text-xs font-bold tracking-widest uppercase border-b-2 border-transparent hover:border-black transition-all">
+            Log Masuk Pentadbir
+        </button>
+    </nav>
 
-        <!-- Login Form Interface -->
-        <div class="hud-interface">
-            <div class="absolute inset-0 rounded-[40px] pointer-events-none bg-gradient-to-br from-white/5 to-transparent"></div>
+    <!-- HERO SECTION -->
+    <main>
+        <section class="hero-video-container">
+            <video autoplay muted loop playsinline class="hero-video">
+                <source src="3samsvidassets.mp4" type="video/mp4">
+            </video>
 
-            <div class="mb-12 relative">
-                <div class="absolute -left-8 top-1/2 -translate-y-1/2 h-14 w-[4px] bg-gradient-to-b from-yellow-500 to-blue-500 rounded-full shadow-[0_0_20px_rgba(212,175,55,0.4)]"></div>
-                <h3 class="text-white text-xl font-black tracking-widest uppercase mb-3">Log Masuk</h3>
-                <p class="text-white/30 text-[11px] leading-relaxed uppercase tracking-[0.25em] font-medium">Sila gunakan kredensial pentadbir untuk akses.</p>
+            <div class="hero-content">
+                <h1>Cloud that feels alive.</h1>
+                <p>Fast. Private. Everywhere.</p>
+            </div>
+            <div class="video-placeholder"></div>
+        </section>
+
+        <!-- INFO SECTION -->
+        <section class="max-w-6xl mx-auto py-24 px-8 grid md:grid-cols-3 gap-16">
+            <div class="text-center">
+                <div class="text-3xl font-light mb-4 text-[#d4af37]">01.</div>
+                <h4 class="font-bold tracking-tighter text-xl mb-2">Automasi Kehadiran</h4>
+                <p class="text-gray-500 text-sm leading-relaxed">Sistem pengesanan digital yang pantas dan tepat untuk setiap ahli kelas.</p>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-light mb-4 text-[#d4af37]">02.</div>
+                <h4 class="font-bold tracking-tighter text-xl mb-2">Analisis Real-Time</h4>
+                <p class="text-gray-500 text-sm leading-relaxed">Paparan data statistik kehadiran secara langsung untuk pemantauan efektif.</p>
+            </div>
+            <div class="text-center">
+                <div class="text-3xl font-light mb-4 text-[#d4af37]">03.</div>
+                <h4 class="font-bold tracking-tighter text-xl mb-2">Sekuriti Elite</h4>
+                <p class="text-gray-500 text-sm leading-relaxed">Infrastruktur awan yang selamat untuk melindungi data pelajar.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="py-12 border-t border-gray-100 text-center">
+        <p class="text-[10px] tracking-[0.5em] text-gray-400 uppercase">© 2026 SMK MEMBAKUT II | 3 Siddiq Elite</p>
+    </footer>
+
+    <!-- LOGIN MODAL -->
+    <div id="loginModal" class="fixed inset-0 z-50 hidden items-center justify-center p-6 transition-opacity duration-300 opacity-0" style="background: rgba(0,0,0,0.4);">
+        <div class="glass-modal w-full max-w-md rounded-[30px] p-10 relative">
+            <button onclick="toggleLoginModal(false)" class="absolute top-6 right-6 text-gray-400 hover:text-black">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <div class="text-center mb-10">
+                <img src="https://i.postimg.cc/xCcWgqmx/photo-6057413719148399989-y-removebg-preview.png" alt="Logo" class="h-16 mx-auto mb-4">
+                <h3 class="text-xl font-bold tracking-tight">Akses Pentadbir</h3>
+                <p class="text-xs text-gray-400 mt-2 uppercase tracking-widest">Sila masukkan kunci keselamatan</p>
             </div>
 
-            <form onsubmit="handleLogin(event)" class="space-y-9 relative z-10">
-                <div class="input-group">
-                    <label class="text-[10px] font-black text-white/50 tracking-[0.4em] ml-1 mb-4 block">E-mel Rasmi</label>
-                    <input type="email" placeholder="ADMIN@3SIDDIQ.EDU.MY" required class="w-full px-8 py-5 rounded-2xl outline-none text-xs tracking-widest font-bold">
+            <form onsubmit="handleLogin(event)" class="space-y-6">
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">E-mel</label>
+                    <input type="email" required placeholder="admin@3siddiq.com" class="w-full bg-gray-50 border border-gray-100 px-6 py-4 rounded-xl text-sm outline-none focus:border-[#d4af37] transition-all">
                 </div>
-
-                <div class="input-group">
-                    <label class="text-[10px] font-black text-white/50 uppercase tracking-[0.4em] ml-1 mb-4 block">Kunci Akses</label>
-                    <input type="password" placeholder="••••••••••••" required class="w-full px-8 py-5 rounded-2xl outline-none text-xs tracking-[1em]">
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Kunci Akses</label>
+                    <input type="password" required placeholder="••••••••" class="w-full bg-gray-50 border border-gray-100 px-6 py-4 rounded-xl text-sm outline-none focus:border-[#d4af37] transition-all">
                 </div>
-
-                <button class="btn-access w-full py-6 rounded-2xl text-[12px] mt-8 uppercase font-black">
-                    Mulakan Akses
+                <button type="submit" class="btn-premium w-full py-5 rounded-xl text-xs font-bold tracking-[0.2em] uppercase">
+                    Buka Sistem
                 </button>
             </form>
-
-            <!-- Metadata Footer -->
-            <div class="mt-16 flex items-center justify-between opacity-20 text-[9px] uppercase tracking-[0.4em] font-black border-t border-white/10 pt-10">
-                <span class="flex items-center gap-3">
-                    <div class="w-2 h-2 bg-blue-500 rounded-full animate-pulse shadow-[0_0_10px_#00d2ff]"></div>
-                    SECURED
-                </span>
-                <span>© 2026 3S ELITE</span>
-            </div>
-        </div>
-
-        <div class="mt-16 text-center">
-            <p class="text-[10px] text-white/5 font-black tracking-[2.5em] uppercase ml-[2.5em]">CLASS OF EXCELLENCE</p>
         </div>
     </div>
 
-    <div id="toast">RALAT AKSES</div>
-
-    <script>
-        // Elite Starfield
-        const starsContainer = document.getElementById('stars-container');
-        const starCount = 80;
-        const stars = [];
-
-        for (let i = 0; i < starCount; i++) {
-            const star = document.createElement('div');
-            star.className = 'star';
-            const size = (Math.random() * 2 + 1) + 'px';
-            star.style.width = size;
-            star.style.height = size;
-            star.style.top = Math.random() * 100 + '%';
-            star.style.left = Math.random() * 100 + '%';
-            star.style.background = Math.random() > 0.9 ? '#d4af37' : 'white';
-            starsContainer.appendChild(star);
-            stars.push({
-                element: star,
-                factor: Math.random() * 50 + 30
-            });
-        }
-
-        let mouseX = 0,
-            mouseY = 0;
-        let targetX = 0,
-            targetY = 0;
-
-        window.addEventListener('mousemove', (e) => {
-            mouseX = (e.clientX - window.innerWidth / 2);
-            mouseY = (e.clientY - window.innerHeight / 2);
-        });
-
-        function animate() {
-            targetX += (mouseX - targetX) * 0.04;
-            targetY += (mouseY - targetY) * 0.04;
-            stars.forEach(s => {
-                s.element.style.transform = `translate(${targetX / s.factor}px, ${targetY / s.factor}px)`;
-            });
-            requestAnimationFrame(animate);
-        }
-        animate();
-
-        let progress = 0;
-        const loaderLabel = document.getElementById('loading-perc');
-
-        function updateLoader() {
-            if (progress < 100) {
-                progress += Math.random() * 1.2;
-                if (progress > 100) progress = 100;
-                loaderLabel.innerText = `PROTOKOL: ${Math.floor(progress)}%`;
-                requestAnimationFrame(updateLoader);
-            }
-        }
-        updateLoader();
-    </script>
 </body>
 
 </html>
