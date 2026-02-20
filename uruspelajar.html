@@ -155,22 +155,22 @@
             </div>
 
             <div class="space-y-3 flex-1">
-                <a href="/panelutama.html" class="flex items-center gap-4 p-4 rounded-2xl hover:bg-white/80 transition-all text-sm font-semibold group border border-transparent hover:border-apple-border">
+                <a href="/3SAMS/panelutama.html" class="flex items-center gap-4 p-4 rounded-2xl hover:bg-white/80 transition-all text-sm font-semibold group border border-transparent hover:border-apple-border">
                     <span class="w-10 h-10 rounded-xl bg-accent-gold/10 flex items-center justify-center group-hover:bg-accent-gold group-hover:text-white transition-all">
                         <i class="fa-solid fa-house"></i>
                     </span> Panel Utama
                 </a>
-                <a href="/uruspelajar.html" class="flex items-center gap-4 p-4 rounded-2xl bg-accent-gold/10 text-accent-gold border border-accent-gold/20 text-sm font-bold">
+                <a href="/3SAMS/uruspelajar.html" class="flex items-center gap-4 p-4 rounded-2xl bg-accent-gold/10 text-accent-gold border border-accent-gold/20 text-sm font-bold">
                     <span class="w-10 h-10 rounded-xl bg-accent-gold flex items-center justify-center text-white">
                         <i class="fa-solid fa-user-tie"></i>
                     </span> Urus Pelajar
                 </a>
-                <a href="/rekodhadir.html" class="flex items-center gap-4 p-4 rounded-2xl hover:bg-white/80 transition-all text-sm font-semibold group border border-transparent hover:border-apple-border">
+                <a href="/3SAMS/rekodhadir.html" class="flex items-center gap-4 p-4 rounded-2xl hover:bg-white/80 transition-all text-sm font-semibold group border border-transparent hover:border-apple-border">
                     <span class="w-10 h-10 rounded-xl bg-accent-gold/10 flex items-center justify-center group-hover:bg-accent-gold group-hover:text-white transition-all">
                         <i class="fa-solid fa-fingerprint"></i>
                     </span> Rekod Hadir
                 </a>
-                <a href="/analitik.html" class="flex items-center gap-4 p-4 rounded-2xl hover:bg-white/80 transition-all text-sm font-semibold group border border-transparent hover:border-apple-border">
+                <a href="/3SAMS/analitik.html" class="flex items-center gap-4 p-4 rounded-2xl hover:bg-white/80 transition-all text-sm font-semibold group border border-transparent hover:border-apple-border">
                     <span class="w-10 h-10 rounded-xl bg-accent-gold/10 flex items-center justify-center group-hover:bg-accent-gold group-hover:text-white transition-all">
                         <i class="fa-solid fa-chart-pie"></i>
                     </span> Analitik
@@ -359,7 +359,7 @@
             getAuth,
             onAuthStateChanged,
             signOut
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
         import {
             getFirestore,
             collection,
@@ -367,7 +367,7 @@
             setDoc,
             updateDoc,
             onSnapshot
-        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBV5pPnUoZ5__ZDnpqutonr0xD8gI1Za7o",
@@ -383,7 +383,7 @@
         const auth = getAuth(app);
 
         onAuthStateChanged(auth, (user) => {
-            if (!user) location.href = "/3SAMS/index.html";
+            if (!user) location.href = "/3SAMS/";
             else document.body.style.display = "block";
         });
 
@@ -452,7 +452,7 @@
 
         window.logout = async () => {
             await signOut(auth);
-            window.location.href = "index.html";
+            window.location.href = "/3SAMS/";
         };
 
         // Student Logic
@@ -602,7 +602,7 @@
                     fillColor: [250, 250, 250]
                 }
             });
-            pdf.save("AMS_3Siddiq_Pelajar.pdf");
+            pdf.save("Pelajar3S.pdf");
         };
     </script>
 </body>
