@@ -383,8 +383,13 @@
         const auth = getAuth(app);
 
         onAuthStateChanged(auth, (user) => {
-            if (!user) location.href = "/3SAMS/";
-            else document.body.style.display = "block";
+            if (!user) {
+                location.href = "/3SAMS/";
+                return;
+            }
+
+            document.body.style.display = "block";
+            initPelajar(); // <<< PENTING
         });
 
         // UI Controls
