@@ -5,17 +5,18 @@
     <link rel="icon" href="favicon.ico">
     <link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
     <link rel="icon" type="image/svg+xml" href="favicon.svg">
-
     <link rel="apple-touch-icon" href="apple-touch-icon.png">
-
     <link rel="manifest" href="site.webmanifest">
-
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>3 SIDDIQ ELITE | AMS</title>
 
+    <!-- Preconnect Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Orbitron:wght@700&display=swap" rel="stylesheet">
 
     <script type="module">
         import {
@@ -27,7 +28,6 @@
             onAuthStateChanged
         } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
-        // Konfigurasi asal anda dikekalkan
         const firebaseConfig = {
             apiKey: "AIzaSyBV5pPnUoZ5__ZDnpqutonr0xD8gI1Za7o",
             authDomain: "semii2go.firebaseapp.com",
@@ -39,10 +39,8 @@
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
-
         let redirecting = false;
 
-        // Fungsi Login
         window.handleLogin = async (e) => {
             e.preventDefault();
             if (redirecting) return;
@@ -52,192 +50,220 @@
             const password = e.target.querySelector("input[type=password]").value;
 
             btn.disabled = true;
-            btn.innerHTML = `<span class="flex items-center justify-center gap-2"><div class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div> MENGESAHKAN...</span>`;
+            btn.innerHTML = `<div class="flex items-center justify-center gap-3"><div class="animate-spin h-4 w-4 border-2 border-white/20 border-t-white rounded-full"></div> MENGESAHKAN...</div>`;
 
             try {
                 redirecting = true;
                 await signInWithEmailAndPassword(auth, email, password);
-                window.location.replace("https://smkmiivault.github.io/3SAMS-PanelUtama/");
+                window.location.href = "panelutama.html";
             } catch (err) {
                 redirecting = false;
-                alert("RALAT: Kredensial tidak sah.");
-                btn.innerHTML = "LOG MASUK";
+                const errorBox = document.getElementById('login-error');
+                errorBox.classList.remove('hidden');
+                btn.innerHTML = "AKSES SISTEM";
                 btn.disabled = false;
             }
         };
 
-        // Modal Logic
         window.toggleLoginModal = (show) => {
             const modal = document.getElementById('loginModal');
+            const content = modal.querySelector('.modal-content');
             if (show) {
                 modal.classList.remove('hidden');
                 modal.classList.add('flex');
-                setTimeout(() => modal.style.opacity = "1", 10);
+                setTimeout(() => {
+                    modal.classList.add('opacity-100');
+                    content.classList.add('scale-100', 'opacity-100');
+                    content.classList.remove('scale-95', 'opacity-0');
+                }, 10);
             } else {
-                modal.style.opacity = "0";
+                modal.classList.remove('opacity-100');
+                content.classList.add('scale-95', 'opacity-0');
+                content.classList.remove('scale-100', 'opacity-100');
                 setTimeout(() => {
                     modal.classList.add('hidden');
                     modal.classList.remove('flex');
-                }, 300);
+                }, 400);
             }
         };
 
-        // Loading Screen Logic
         window.addEventListener('load', () => {
             const loader = document.getElementById('master-loader');
-            let progress = 0;
+            const progressFill = document.querySelector('.loader-progress-fill');
             const progressText = document.getElementById('progress-text');
+            let progress = 0;
 
             const interval = setInterval(() => {
-                progress += Math.random() * 15;
+                progress += Math.random() * 25;
                 if (progress >= 100) {
                     progress = 100;
                     clearInterval(interval);
                     setTimeout(() => {
                         loader.style.opacity = '0';
-                        setTimeout(() => loader.remove(), 500);
-                    }, 500);
+                        loader.style.transform = 'scale(1.1)';
+                        setTimeout(() => loader.remove(), 600);
+                    }, 400);
                 }
+                progressFill.style.width = progress + "%";
                 progressText.innerText = Math.floor(progress) + "%";
-            }, 150);
+            }, 100);
         });
 
         onAuthStateChanged(auth, (user) => {
             if (user && !redirecting) {
-                window.location.replace("https://smkmiivault.github.io/3SAMS-PanelUtama/");
+                window.location.href = "panelutama.html";
             }
         });
     </script>
 
     <style>
+        :root {
+            --bg-soft: #ffffff;
+            --apple-black: #1d1d1f;
+            --apple-blue: #0071e3;
+            --glass: rgba(255, 255, 255, 0.75);
+        }
+
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #ffffff;
-            color: #1a1a1a;
+            background-color: var(--bg-soft);
+            color: var(--apple-black);
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
         }
 
-        .hero-video-container {
+        .glass-nav {
+            background: var(--glass);
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        /* Hero Video Elite Styling */
+        .hero-section {
+            padding: 1.25rem;
+            margin-top: 80px;
+        }
+
+        @media (min-width: 768px) {
+            .hero-section {
+                padding: 2.5rem;
+            }
+        }
+
+        .video-wrapper {
             position: relative;
             width: 100%;
-            height: 100vh;
-            background: #ffffff;
+            height: 75vh;
+            border-radius: 32px;
             overflow: hidden;
-        }
-
-        /* VIDEO PERFECT CENTER NO CROP */
-        .hero-video {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-
-            max-width: 100%;
-            max-height: 100%;
-
-            width: auto;
-            height: auto;
-
-            object-fit: contain;
-        }
-
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
             background: #000;
+            box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.2);
+            transform: translateZ(0);
+            /* Fix for overflow hidden on Safari */
+        }
+
+        @media (min-width: 1024px) {
+            .video-wrapper {
+                height: 85vh;
+                border-radius: 48px;
+            }
+        }
+
+        .hero-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.85) contrast(1.1);
+        }
+
+        /* Entrance Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .reveal {
+            animation: fadeInUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* Buttons & Inputs */
+        .btn-elite {
+            background: var(--apple-black);
             color: white;
-            text-align: center;
-            padding: 40px 20px;
+            padding: 12px 28px;
+            border-radius: 980px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .hero-media video {
-            max-width: 90vw;
-            max-height: 70vh;
-            width: auto;
-            height: auto;
-            border-radius: 18px;
-            box-shadow: 0 40px 120px rgba(0, 0, 0, 0.6);
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-            color: white;
-            text-align: center;
-            top: 40%;
-            transform: translateY(-40%);
-            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-
-        .title-orbitron {
-            font-family: 'Orbitron', sans-serif;
-            letter-spacing: 0.15em;
-        }
-
-        .glass-modal {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-        }
-
-        .btn-premium {
-            background: #1a1a1a;
-            color: white;
-            transition: all 0.3s ease;
-        }
-
-        .btn-premium:hover {
-            background: #d4af37;
+        .btn-elite:hover {
             transform: translateY(-2px);
+            background: #000;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-card {
+            border-radius: 40px;
+            padding: 3rem;
+            background: #fbfbfd;
+            border: 1px solid rgba(0, 0, 0, 0.03);
+            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            background: #fff;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.05);
+            border-color: rgba(0, 0, 0, 0.08);
         }
 
         #master-loader {
             position: fixed;
             inset: 0;
-            background: white;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.5s ease;
+            background: #fff;
+            z-index: 10000;
+            transition: all 1s cubic-bezier(0.65, 0, 0.35, 1);
         }
 
-        .loader-bar {
-            width: 200px;
-            height: 2px;
-            background: #eee;
-            margin-top: 20px;
-            position: relative;
-            overflow: hidden;
+        .input-elite {
+            background: #f5f5f7;
+            border: 1.5px solid transparent;
+            border-radius: 18px;
+            padding: 16px 20px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            width: 100%;
         }
 
-        .loader-bar-fill {
-            position: absolute;
-            height: 100%;
-            background: #d4af37;
-            width: 0%;
-            animation: loading 2s ease-in-out infinite;
+        .input-elite:focus {
+            background: #fff;
+            border-color: var(--apple-blue);
+            box-shadow: 0 0 0 4px rgba(0, 113, 227, 0.1);
+            outline: none;
         }
 
-        @keyframes loading {
-            0% {
-                width: 0%;
-                left: 0;
-            }
-
-            50% {
-                width: 100%;
-                left: 0;
-            }
-
-            100% {
-                width: 0%;
-                left: 100%;
-            }
+        .badge-elite {
+            display: inline-block;
+            padding: 6px 14px;
+            background: rgba(0, 113, 227, 0.08);
+            color: var(--apple-blue);
+            border-radius: 980px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 1.5rem;
         }
     </style>
 </head>
@@ -245,87 +271,150 @@
 <body class="antialiased">
 
     <!-- LOADER -->
-    <div id="master-loader">
-        <img src="https://i.postimg.cc/FsL0XknW/SMKMII-LGO-removebg-preview.png" alt="Logo" class="h-12 mb-6 opacity-80">
-        <div class="text-[10px] font-bold tracking-[0.3em] uppercase text-gray-400">Memuatkan Sistem <span id="progress-text">0%</span></div>
-        <div class="loader-bar">
-            <div class="loader-bar-fill"></div>
+    <div id="master-loader" class="flex flex-col items-center justify-center">
+        <div class="flex flex-col items-center scale-90 md:scale-100">
+            <img src="https://i.postimg.cc/FsL0XknW/SMKMII-LGO-removebg-preview.png" alt="Logo" class="h-20 w-auto mb-10 opacity-80">
+            <div class="w-[200px] h-[2px] bg-gray-100 rounded-full overflow-hidden">
+                <div class="loader-progress-fill h-full bg-black w-0 transition-all duration-300"></div>
+            </div>
+            <div class="text-[10px] font-bold tracking-[0.4em] text-gray-400 uppercase mt-8">
+                ESTABLISHING <span id="progress-text" class="text-black ml-1">0%</span>
+            </div>
         </div>
     </div>
 
-    <!-- NAVBAR -->
-    <nav class="fixed top-0 w-full z-40 px-8 py-6 flex justify-between items-center bg-white/80 backdrop-blur-md">
-        <div class="flex items-center gap-4">
-            <img src="https://i.postimg.cc/FsL0XknW/SMKMII-LGO-removebg-preview.png" alt="SMKMII" class="h-10">
-            <div class="w-[1px] h-6 bg-gray-200"></div>
-            <span class="text-xs font-black tracking-widest uppercase">3 Siddiq Elite</span>
+    <!-- NAVIGATION -->
+    <nav class="glass-nav fixed top-0 w-full z-50">
+        <div class="max-w-[1400px] mx-auto px-8 h-20 flex justify-between items-center">
+            <div class="flex items-center gap-5">
+                <img src="https://i.postimg.cc/FsL0XknW/SMKMII-LGO-removebg-preview.png" alt="Logo" class="h-10 hover:opacity-80 transition-opacity cursor-pointer">
+                <div class="h-6 w-[1px] bg-gray-200"></div>
+                <div class="flex flex-col">
+                    <span class="text-[16px] font-extrabold tracking-tight leading-none">3 SIDDIQ ELITE</span>
+                    <span class="text-[9px] text-gray-400 font-bold tracking-[0.1em] uppercase mt-1">Management Portal</span>
+                </div>
+            </div>
+            <div class="hidden md:block">
+                <button onclick="toggleLoginModal(true)" class="btn-elite">
+                    Akses Sistem
+                </button>
+            </div>
+            <div class="md:hidden">
+                <button onclick="toggleLoginModal(true)" class="p-2">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13 12H3" />
+                    </svg>
+                </button>
+            </div>
         </div>
-        <button onclick="toggleLoginModal(true)" class="text-xs font-bold tracking-widest uppercase border-b-2 border-transparent hover:border-black transition-all">
-            Log Masuk Pentadbir
-        </button>
     </nav>
 
-    <!-- HERO SECTION -->
+    <!-- MAIN CONTENT -->
     <main>
-        <section class="hero-video-container">
-            <video class="hero-video" autoplay muted loop playsinline>
-                <source src="3samsvidassets.mp4" type="video/mp4">
-            </video>
+        <!-- HERO -->
+        <section class="hero-section reveal" style="animation-delay: 0.2s;">
+            <div class="max-w-[1400px] mx-auto">
+                <div class="video-wrapper">
+                    <!-- Overlay dengan gradien lebih dalam -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-10"></div>
+                    <div class="absolute inset-0 bg-black/10 z-10"></div>
+
+                    <div class="absolute bottom-12 left-8 right-8 md:bottom-20 md:left-20 z-20 text-white">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 bg-white/10 backdrop-blur-md rounded-full border border-white/20 mb-6">
+                            <span class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></span>
+                            <span class="text-[10px] font-bold tracking-widest uppercase">SMK MEMBAKUT II | 3 SIDDIQ</span>
+                        </div>
+                        <h1 class="text-5xl md:text-8xl font-extrabold tracking-tightest mb-6 leading-[0.9]">
+                            Elite.<br><span class="text-white/40">Digital Excellence.</span>
+                        </h1>
+                        <p class="text-base md:text-xl text-white/60 max-w-xl font-medium leading-relaxed">
+                            Sistem pengurusan kehadiran futuristik yang menyatukan data dan disiplin dalam satu ekosistem yang sempurna.
+                        </p>
+                    </div>
+
+                    <video class="hero-video" autoplay muted loop playsinline>
+                        <source src="3samsvidassets.mp4" type="video/mp4">
+                        <!-- Fallback background if video fails -->
+                        <div class="w-full h-full bg-neutral-900"></div>
+                    </video>
+                </div>
+            </div>
         </section>
 
-        <!-- INFO SECTION -->
-        <section class="max-w-6xl mx-auto py-24 px-8 grid md:grid-cols-3 gap-16">
-            <div class="text-center">
-                <div class="text-3xl font-light mb-4 text-[#d4af37]">01.</div>
-                <h4 class="font-bold tracking-tighter text-xl mb-2">Automasi Kehadiran</h4>
-                <p class="text-gray-500 text-sm leading-relaxed">Sistem pengesanan digital yang pantas dan tepat untuk setiap ahli kelas.</p>
-            </div>
-            <div class="text-center">
-                <div class="text-3xl font-light mb-4 text-[#d4af37]">02.</div>
-                <h4 class="font-bold tracking-tighter text-xl mb-2">Analisis Real-Time</h4>
-                <p class="text-gray-500 text-sm leading-relaxed">Paparan data statistik kehadiran secara langsung untuk pemantauan efektif.</p>
-            </div>
-            <div class="text-center">
-                <div class="text-3xl font-light mb-4 text-[#d4af37]">03.</div>
-                <h4 class="font-bold tracking-tighter text-xl mb-2">Sekuriti Elite</h4>
-                <p class="text-gray-500 text-sm leading-relaxed">Infrastruktur awan yang selamat untuk melindungi data pelajar.</p>
+        <!-- FEATURES -->
+        <section class="max-w-[1400px] mx-auto py-32 px-8">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="feature-card reveal" style="animation-delay: 0.4s;">
+                    <span class="badge-elite">Speed</span>
+                    <h4 class="text-2xl font-extrabold mb-4">Pantas & Intuitif</h4>
+                    <p class="text-gray-500 text-sm leading-relaxed font-medium">Rekod kehadiran dalam milisaat. Direka untuk kelancaran aliran kerja harian anda tanpa gangguan.</p>
+                </div>
+
+                <div class="feature-card reveal" style="animation-delay: 0.5s;">
+                    <span class="badge-elite">Intelligence</span>
+                    <h4 class="text-2xl font-extrabold mb-4">Analitik Pintar</h4>
+                    <p class="text-gray-500 text-sm leading-relaxed font-medium">Visualisasi data yang mendalam. Pantau trend kehadiran dengan laporan yang dijana secara automatik.</p>
+                </div>
+
+                <div class="feature-card reveal" style="animation-delay: 0.6s;">
+                    <span class="badge-elite">Security</span>
+                    <h4 class="text-2xl font-extrabold mb-4">Keselamatan Pro</h4>
+                    <p class="text-gray-500 text-sm leading-relaxed font-medium">Data dilindungi dengan standard penyulitan tertinggi. Hanya akses yang sah dibenarkan masuk.</p>
+                </div>
             </div>
         </section>
     </main>
 
     <!-- FOOTER -->
-    <footer class="py-12 border-t border-gray-100 text-center">
-        <p class="text-[10px] tracking-[0.5em] text-gray-400 uppercase">© 2026 SMK MEMBAKUT II | 3 Siddiq Elite</p>
+    <footer class="py-20 bg-white border-t border-gray-100">
+        <div class="max-w-[1400px] mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="flex items-center gap-4">
+                <img src="https://i.postimg.cc/FsL0XknW/SMKMII-LGO-removebg-preview.png" alt="Logo" class="h-8 grayscale opacity-50">
+                <span class="text-[10px] font-bold tracking-[0.3em] text-gray-400 uppercase">3 Siddiq Elite AMS</span>
+            </div>
+            <p class="text-[10px] font-bold tracking-[0.2em] text-gray-300 uppercase">
+                Designed in Membakut • © 2026
+            </p>
+        </div>
     </footer>
 
     <!-- LOGIN MODAL -->
-    <div id="loginModal" class="fixed inset-0 z-50 hidden items-center justify-center p-6 transition-opacity duration-300 opacity-0" style="background: rgba(0,0,0,0.4);">
-        <div class="glass-modal w-full max-w-md rounded-[30px] p-10 relative">
-            <button onclick="toggleLoginModal(false)" class="absolute top-6 right-6 text-gray-400 hover:text-black">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+    <div id="loginModal" class="fixed inset-0 z-[100] hidden items-center justify-center p-6 bg-black/60 backdrop-blur-xl transition-all duration-500 opacity-0">
+        <div class="modal-content w-full max-w-[440px] bg-white rounded-[40px] p-10 relative shadow-2xl scale-95 opacity-0">
+            <button onclick="toggleLoginModal(false)" class="absolute top-8 right-8 w-10 h-10 flex items-center justify-center rounded-full bg-gray-50 text-gray-400 hover:text-black hover:bg-gray-100 transition-all">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path d="M18 6L6 18M6 6l12 12"></path>
                 </svg>
             </button>
 
-            <div class="text-center mb-10">
-                <img src="https://i.postimg.cc/xCcWgqmx/photo-6057413719148399989-y-removebg-preview.png" alt="Logo" class="h-16 mx-auto mb-4">
-                <h3 class="text-xl font-bold tracking-tight">Akses Pentadbir</h3>
-                <p class="text-xs text-gray-400 mt-2 uppercase tracking-widest">Sila masukkan kunci keselamatan</p>
+            <div class="mb-10">
+                <h3 class="text-3xl font-extrabold tracking-tight mb-2">Log Masuk</h3>
+                <p class="text-sm text-gray-400 font-medium">Sila masukkan kredensial pentadbir anda.</p>
+            </div>
+
+            <div id="login-error" class="hidden mb-6 p-4 bg-red-50 text-red-600 text-[12px] font-bold rounded-2xl border border-red-100 text-center">
+                Akses ditolak. Sila semak semula maklumat anda.
             </div>
 
             <form onsubmit="handleLogin(event)" class="space-y-6">
                 <div>
-                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">E-mel</label>
-                    <input type="email" required placeholder="admin@3siddiq.com" class="w-full bg-gray-50 border border-gray-100 px-6 py-4 rounded-xl text-sm outline-none focus:border-[#d4af37] transition-all">
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-3 block">ID Pentadbir</label>
+                    <input type="email" required placeholder="name@3siddiq.com" class="input-elite">
                 </div>
                 <div>
-                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-2 block">Kunci Akses</label>
-                    <input type="password" required placeholder="••••••••" class="w-full bg-gray-50 border border-gray-100 px-6 py-4 rounded-xl text-sm outline-none focus:border-[#d4af37] transition-all">
+                    <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1 mb-3 block">Kata Laluan</label>
+                    <input type="password" required placeholder="••••••••" class="input-elite">
                 </div>
-                <button type="submit" class="btn-premium w-full py-5 rounded-xl text-xs font-bold tracking-[0.2em] uppercase">
-                    Buka Sistem
-                </button>
+                <div class="pt-4">
+                    <button type="submit" class="btn-elite w-full py-5 text-[15px] shadow-2xl shadow-black/10">
+                        Sahkan Akses
+                    </button>
+                </div>
             </form>
+
+            <p class="mt-10 text-center text-[10px] text-gray-300 font-bold uppercase tracking-widest">
+                Protected by 3S-Elite Security
+            </p>
         </div>
     </div>
 
